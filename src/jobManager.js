@@ -3,6 +3,80 @@
  */
 import schedule from 'node-schedule';
 import moment from 'moment';
+import { isFunction } from './utils'
+
+const stopped = 'job-state-stopped';
+const running = 'job-state-running';
+const pausing = 'job-state-pausing';
+
+class Job {
+    constructor(job_id, job_name, job_rule, job_exec, options) {
+        this.id = job_id;
+        this.name = job_name;
+        this.rule = job_rule;
+        this.exec = job_exec;
+        this.options = options;
+
+        this.start = () => {
+            this._start();
+        };
+        this.stop = () => {
+            this._stop();
+        };
+        this.suspend = () => {
+            this._suspend();
+        };
+        this.resume = () => {
+            this._resume();
+        };
+
+        this.state = stopped;
+
+        if (options.autoStart) {
+            this._start();
+        }
+    }
+
+    _start() {
+        if (!this.scheduleJob) {
+            this.scheduleJob = schedule.scheduleJob(this.rule, ()=> {
+                if (this.state !== pausing) {
+                    this.exec();
+                }
+            });
+        }
+        if (this.state === stopped) {
+            this.state = running;
+            this.printLog && console.log(moment().format('HH:mm:ss') + ` job [${this.name}(${this.id})] is started.`);
+        }
+        else {
+            this.printLog && console.log(moment().format('HH:mm:ss') + ` job [${this.name}(${this.id})] is already running.`);
+        }
+    }
+
+    _stop() {
+        if (this.scheduleJob) {
+            this.scheduleJob.cancel();
+            this.scheduleJob = null;
+            this.state = stopped;
+            this.printLog && console.log(moment().format('HH:mm:ss') + ` job [${this.name}(${this.id})] is canceled.`);
+        }
+    }
+
+    _suspend() {
+        if (this.scheduleJob) {
+            this.state = pausing;
+            this.printLog && console.log(moment().format('HH:mm:ss') + ` job [${this.name}(${this.id})] is suspended.`);
+        }
+    }
+
+    _resume() {
+        if (this.scheduleJob) {
+            this.state = running;
+            this.printLog && console.log(moment().format('HH:mm:ss') + ` job [${this.name}(${this.id})] is resumed.`);
+        }
+    }
+}
 
 
 const manager = {
@@ -21,7 +95,7 @@ const manager = {
             options = arguments[4];
         }
         else if (arguments.length == 4) {
-            if (_.isFunction(arguments[3])) {
+            if (isFunction(arguments[3])) {
                 job_id = arguments[0];
                 job_name = arguments[1];
                 job_rule = arguments[2];
@@ -44,70 +118,17 @@ const manager = {
         else {
             throw new Error('invalid arguments');
         }
-        options =  Object.assign({autoStart: true, printLog: false}, options|| {});
+        options =  Object.assign({autoStart: true, printLog: true}, options|| {});
 
         job = this.job_stores[job_id];
+
         if (!job) {
-            job = {
-                id: job_id,
-                name: job_name,
-                rule: job_rule,
-                stop: stopJob,
-                start: startJob,
-                suspend: suspendJob,
-                resume: resumeJob,
-                job_running: false,
-                job_pause: false,
-                scheduleJob: null,
-                printLog: options.printLog
-            };
-
-            function startJob() {
-                var self = this;
-                if (!this.job_running) {
-                    this.scheduleJob = schedule.scheduleJob(job_rule, ()=> {
-                        if (!self.job_pause) {
-                            job_exec();
-                        }
-                    });
-                    this.job_running = true;
-                    this.printLog && console.log(moment().format('HH:mm:ss') + ' job [' + job_id + '] is started.');
-                }
-                else {
-                    this.printLog && console.log(moment().format('HH:mm:ss') + ' job [' + job_id + '] is already running.');
-                }
-            }
-
-            function stopJob() {
-                if (this.scheduleJob) {
-                    this.scheduleJob.cancel();
-                    this.job_running = false;
-                    this.printLog && console.log(moment().format('HH:mm:ss') + ' job [' + job_id + '] is canceled.');
-                }
-            }
-
-            function suspendJob() {
-                if (this.scheduleJob) {
-                    this.job_pause = true;
-                    this.printLog && console.log(moment().format('HH:mm:ss') + ' job [' + job_id + '] is suspended.');
-                }
-            }
-
-            function resumeJob() {
-                if (this.scheduleJob) {
-                    this.job_pause = false;
-                    this.printLog && console.log(moment().format('HH:mm:ss') + ' job [' + job_id + '] is resumed.');
-                }
-            }
-
+            job = new Job(job_id, job_name, job_rule, job_exec, options);
             this.job_stores[job_id] = job;
             this.length++;
-
-            job.printLog && console.log(moment().format('HH:mm:ss') + ' job [' + job_id + '] is created.');
-
-            if (options.autoStart) {
-                job.start();
-            }
+            options.printLog && console.log(moment().format('HH:mm:ss') + ` job [${job.name}(${job.id})] is created.` );
+        } else {
+            options.printLog && console.log(moment().format('HH:mm:ss') + ` job [${job.name}(${job.id})] is already created.` );
         }
 
         return job;
@@ -115,10 +136,11 @@ const manager = {
     destroyJob: function (job_id) {
         let job = this.job_stores[job_id];
         if (job) {
+            this.printLog && console.log(moment().format('HH:mm:ss') + ` job [${job.name}(${job.id})] is destroyed.`);
             job.stop();
             this.job_stores[job_id] = job = null;
             this.length--;
-            this.printLog && console.log(moment().format('HH:mm:ss') + ' job [' + job_id + '] is destroyed.');
+
         }
     }
 };

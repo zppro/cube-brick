@@ -3,7 +3,7 @@
  */
 
 import { expect } from 'chai';
-import { isString, isObject, pick, pluck, values, range, rangeDateAsMonth, rangeDateAsYear, rangeDateAsDay,
+import { isString, isObject, isFunction, pick, pluck, values, range, rangeDateAsMonth, rangeDateAsYear, rangeDateAsDay,
     setProperty, setPropertyRecursion, setPropertyDotExpression, getPropertyCount,
     randomN, randomS, readDirectoryStructure, chunkArrayByCapacity, chunkArrayByQuantity, flatten, unflatten } from '../src/utils';
 
@@ -12,11 +12,12 @@ describe('module [utils]', () => {
     let str = 'this is a string', number = 3, arrRange, monthRange, dateRange, yearRange,
         objPick = { a: 1, b:2, c:3, d:4, e:5 }, objPickStr = JSON.stringify(objPick),
         objPluck = [{ a: 1, b:2, c:3, d:4, e:5 }, { a: 11, b:12, c:13, d:14, e:15 }], objPluckStr = JSON.stringify(objPluck),
-        obj = {foo: 'bar'}, objStr = JSON.stringify(obj),
+        func1 = function() {}, func1Str = func1.toString(), func2 = ()=> 1, func2Str = func2.toString(),
+        obj = {foo: 'bar' ,bas: ()=> 'aaa'}, objStr = JSON.stringify(obj),
         objRecursion = {foo: { bar: 'bas'}}, objRecursionStr = JSON.stringify(objRecursion),
         objDotExpression = {foo: { bar: { bas: 'dot'}}}, objDotExpressionStr = JSON.stringify(objDotExpression),
         objParent = {a:1}, objParentStr = JSON.stringify(objParent),objChildren,
-        arr= ['aa', 134], arrStr = JSON.stringify(arr), arrChunked,
+        arr= ['aa', 134 , function(){return 2;}], arrStr = JSON.stringify(arr), arrChunked,
         objUnflatten, objUnflattenStr, objFlatten, objFlattenStr;
 
     describe(`test function <isString>`, () => {
@@ -86,6 +87,41 @@ describe('module [utils]', () => {
             expect(isObject(undefined)).to.be.not.ok;
         });
     });
+
+    describe(`test function <isFunction>`, () => {
+        it(`'${str}' expect to be not a function`, () => {
+            expect(isFunction(str)).to.be.not.ok;
+        });
+
+        it(`${number} expect to be not a function`, () => {
+            expect(isFunction(number)).to.be.not.ok;
+        });
+
+        it( `let func1 = ${func1Str}, func1 expect to be a function`, () => {
+            expect(isFunction(func1)).to.be.ok;
+        });
+
+        it( `let func2 = ${func2Str}, func1 expect to be a function`, () => {
+            expect(isFunction(func2)).to.be.ok;
+        });
+
+        it(`obj.bas expect to be a function`, () => {
+            expect(isObject(obj.bas)).to.be.ok;
+        });
+
+        it(`arr[2] expect to be a function`, () => {
+            expect(isObject(arr[2])).to.be.ok;
+        });
+
+        it(`null expect to be a not function`, () => {
+            expect(isFunction(null)).to.be.not.ok;
+        });
+
+        it(`undefined expect to be not a function`, () => {
+            expect(isFunction(undefined)).to.be.not.ok;
+        });
+    });
+
 
     describe(`test function <pick>`, () => {
         it( `let objPick = ${objPickStr}, pick(objPick, 'a','e') expect to be {a:1, e:5}`, () => {
