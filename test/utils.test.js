@@ -5,7 +5,8 @@
 import { expect } from 'chai';
 import { isString, isObject, isFunction, pick, pluck, values, range, rangeDateAsMonth, rangeDateAsYear, rangeDateAsDay,
     setProperty, setPropertyRecursion, setPropertyDotExpression, getPropertyCount,
-    randomN, randomS, readDirectoryStructure, chunkArrayByCapacity, chunkArrayByQuantity, flatten, unflatten } from '../src/utils';
+    randomN, randomS, readDirectoryStructure, chunkArrayByCapacity, chunkArrayByQuantity, flatten, unflatten,
+    isPhone, isIDNo, sexFromIDNo,birthdayFromIDNo } from '../src/utils';
 
 describe('module [utils]', () => {
 
@@ -315,4 +316,29 @@ describe('module [utils]', () => {
             expect(objUnflatten.b.cet).to.be.equal('cet');
         });
     });
+
+    describe(`test function <isPhone>`, () => {
+        it(`The isPhone('13958009802') should be ok`, function() {
+            expect(isPhone('13958009802')).to.be.ok;
+        });
+    });
+
+    describe(`test function <isIDNo>`, () => {
+        it(`The isIDNo('330104191612181028') should be ok`, function() {
+            expect(isIDNo('330104191612181028')).to.be.ok;
+        });
+    });
+
+    describe(`test function <sexFromIDNo>`, () => {
+        it(`The sexFromIDNo('330104191612181028') should be 'F' `, function() {
+            expect(sexFromIDNo('330104191612181028')).to.be.equal('F');
+        });
+    });
+
+    describe(`test function <birthdayFromIDNo>`, () => {
+        it(`The birthdayFromIDNo('330104191612181028') should be '1916-12-18' `, function() {
+            expect(birthdayFromIDNo('330104191612181028')).to.be.equal('1916-12-18');
+        });
+    });
+    
 });
