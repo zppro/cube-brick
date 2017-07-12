@@ -30,18 +30,18 @@ function Dict() {
 
 Dict.prototype.add = function (k, o) {
     if ((0, _utils.isString)(o)) {
-        var pairs = o.split(","),
+        let pairs = o.split(","),
             _keys = [],
             _vals = [];
-        pairs.forEach(function (io) {
-            var split = void 0;
+        pairs.forEach(io => {
+            let split;
             if (io.indexOf("=") != -1) {
                 split = "=";
             } else if (io.indexOf(":") != -1) {
                 split = ":";
             }
             if (split) {
-                var arrKV = io.split(split);
+                let arrKV = io.split(split);
 
                 _keys.push(arrKV[0]);
                 _vals.push(arrKV[1]);
@@ -58,12 +58,8 @@ Dict.prototype.add = function (k, o) {
                 this.keys[k] = o;
                 this.vals[k] = o;
             } else if (Array.isArray(o[0])) {
-                this.keys[k] = o.map(function (it) {
-                    return it[0];
-                });
-                this.vals[k] = o.map(function (it) {
-                    return it[1];
-                });
+                this.keys[k] = o.map(it => it[0]);
+                this.vals[k] = o.map(it => it[1]);
             } else if ((0, _utils.isObject)(o[0])) {
                 this.keys[k] = (0, _utils.pluck)(o, 'k');
                 this.vals[k] = (0, _utils.pluck)(o, 'v');
@@ -78,8 +74,8 @@ Dict.prototype.add = function (k, o) {
         this.keys[k] = Object.keys(o);
         this.vals[k] = (0, _utils.values)(o);
     }
-    var pairObj = {};
-    for (var i = 0, len = this.keys[k].length; i < len; i++) {
+    let pairObj = {};
+    for (let i = 0, len = this.keys[k].length; i < len; i++) {
         pairObj[this.keys[k][i]] = this.vals[k][i];
     }
     this.pairs[k] = pairObj;
@@ -98,58 +94,37 @@ Dict.prototype.clear = function () {
 };
 
 Dict.prototype.readJson = function (file) {
-    var self = this;
-    return (0, _fsExtra.pathExists)(file).then(function (exists) {
+    let self = this;
+    return (0, _fsExtra.pathExists)(file).then(exists => {
         if (!exists) {
             return;
         }
 
-        return (0, _fsExtra.readJson)(file).then(function (jo) {
+        return (0, _fsExtra.readJson)(file).then(jo => {
             if (Array.isArray(jo) && jo.length > 0) {
-                for (var i = 0, len = jo.length; i < len; i++) {
+                for (let i = 0, len = jo.length; i < len; i++) {
                     self.add("d" + i, jo[i]);
                 }
             } else if ((0, _utils.isObject)(jo)) {
-                var _iteratorNormalCompletion = true;
-                var _didIteratorError = false;
-                var _iteratorError = undefined;
-
-                try {
-                    for (var _iterator = Object.keys(jo)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                        var k = _step.value;
-
-                        self.add(k, jo[k]);
-                    }
-                } catch (err) {
-                    _didIteratorError = true;
-                    _iteratorError = err;
-                } finally {
-                    try {
-                        if (!_iteratorNormalCompletion && _iterator.return) {
-                            _iterator.return();
-                        }
-                    } finally {
-                        if (_didIteratorError) {
-                            throw _iteratorError;
-                        }
-                    }
+                for (let k of Object.keys(jo)) {
+                    self.add(k, jo[k]);
                 }
             }
-        }).catch(function (err) {
+        }).catch(err => {
             console.error(err);
         });
     });
 };
 
 Dict.prototype.writeJSON = function (file) {
-    var self = this;
-    return (0, _fsExtra.ensureFile)(file).then(function () {
+    let self = this;
+    return (0, _fsExtra.ensureFile)(file).then(() => {
         return (0, _fsExtra.writeJson)(file, self.pairs);
-    }).catch(function (err) {
+    }).catch(err => {
         console.error(err);
     });
 };
 
-exports.default = function () {
+exports.default = () => {
     return new Dict();
 };

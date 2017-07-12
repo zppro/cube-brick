@@ -4,11 +4,6 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /**
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * Created by zppro on 17-6-23.
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      */
-
-
 var _nodeSchedule = require('node-schedule');
 
 var _nodeSchedule2 = _interopRequireDefault(_nodeSchedule);
@@ -21,35 +16,32 @@ var _utils = require('./utils');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+const stopped = 'job-state-stopped'; /**
+                                      * Created by zppro on 17-6-23.
+                                      */
 
-var stopped = 'job-state-stopped';
-var running = 'job-state-running';
-var pausing = 'job-state-pausing';
+const running = 'job-state-running';
+const pausing = 'job-state-pausing';
 
-var Job = function () {
-    function Job(job_id, job_name, job_rule, job_exec, options) {
-        var _this = this;
-
-        _classCallCheck(this, Job);
-
+class Job {
+    constructor(job_id, job_name, job_rule, job_exec, options) {
         this.id = job_id;
         this.name = job_name;
         this.rule = job_rule;
         this.exec = job_exec;
         this.options = options;
 
-        this.start = function () {
-            _this._start();
+        this.start = () => {
+            this._start();
         };
-        this.stop = function () {
-            _this._stop();
+        this.stop = () => {
+            this._stop();
         };
-        this.suspend = function () {
-            _this._suspend();
+        this.suspend = () => {
+            this._suspend();
         };
-        this.resume = function () {
-            _this._resume();
+        this.resume = () => {
+            this._resume();
         };
 
         this.state = stopped;
@@ -59,69 +51,54 @@ var Job = function () {
         }
     }
 
-    _createClass(Job, [{
-        key: '_start',
-        value: function _start() {
-            var _this2 = this;
+    _start() {
+        if (!this.scheduleJob) {
+            this.scheduleJob = _nodeSchedule2.default.scheduleJob(this.rule, () => {
+                if (this.state !== pausing) {
+                    this.exec();
+                }
+            });
+        }
+        if (this.state === stopped) {
+            this.state = running;
+            this.printLog && console.log((0, _moment2.default)().format('HH:mm:ss') + ` job [${this.name}(${this.id})] is started.`);
+        } else {
+            this.printLog && console.log((0, _moment2.default)().format('HH:mm:ss') + ` job [${this.name}(${this.id})] is already running.`);
+        }
+    }
 
-            if (!this.scheduleJob) {
-                this.scheduleJob = _nodeSchedule2.default.scheduleJob(this.rule, function () {
-                    if (_this2.state !== pausing) {
-                        _this2.exec();
-                    }
-                });
-            }
-            if (this.state === stopped) {
-                this.state = running;
-                this.printLog && console.log((0, _moment2.default)().format('HH:mm:ss') + (' job [' + this.name + '(' + this.id + ')] is started.'));
-            } else {
-                this.printLog && console.log((0, _moment2.default)().format('HH:mm:ss') + (' job [' + this.name + '(' + this.id + ')] is already running.'));
-            }
+    _stop() {
+        if (this.scheduleJob) {
+            this.scheduleJob.cancel();
+            this.scheduleJob = null;
+            this.state = stopped;
+            this.printLog && console.log((0, _moment2.default)().format('HH:mm:ss') + ` job [${this.name}(${this.id})] is canceled.`);
         }
-    }, {
-        key: '_stop',
-        value: function _stop() {
-            if (this.scheduleJob) {
-                this.scheduleJob.cancel();
-                this.scheduleJob = null;
-                this.state = stopped;
-                this.printLog && console.log((0, _moment2.default)().format('HH:mm:ss') + (' job [' + this.name + '(' + this.id + ')] is canceled.'));
-            }
-        }
-    }, {
-        key: '_suspend',
-        value: function _suspend() {
-            if (this.scheduleJob) {
-                this.state = pausing;
-                this.printLog && console.log((0, _moment2.default)().format('HH:mm:ss') + (' job [' + this.name + '(' + this.id + ')] is suspended.'));
-            }
-        }
-    }, {
-        key: '_resume',
-        value: function _resume() {
-            if (this.scheduleJob) {
-                this.state = running;
-                this.printLog && console.log((0, _moment2.default)().format('HH:mm:ss') + (' job [' + this.name + '(' + this.id + ')] is resumed.'));
-            }
-        }
-    }]);
+    }
 
-    return Job;
-}();
+    _suspend() {
+        if (this.scheduleJob) {
+            this.state = pausing;
+            this.printLog && console.log((0, _moment2.default)().format('HH:mm:ss') + ` job [${this.name}(${this.id})] is suspended.`);
+        }
+    }
 
-var manager = {
+    _resume() {
+        if (this.scheduleJob) {
+            this.state = running;
+            this.printLog && console.log((0, _moment2.default)().format('HH:mm:ss') + ` job [${this.name}(${this.id})] is resumed.`);
+        }
+    }
+}
+
+const manager = {
     job_stores: {},
     length: 0,
-    getJob: function getJob(job_id) {
+    getJob: function (job_id) {
         return this.job_stores[job_id];
     },
-    createJob: function createJob() {
-        var job_id = void 0,
-            job_name = void 0,
-            job_rule = void 0,
-            job_exec = void 0,
-            options = void 0,
-            job = void 0;
+    createJob: function () {
+        let job_id, job_name, job_rule, job_exec, options, job;
         if (arguments.length == 5) {
             job_id = arguments[0];
             job_name = arguments[1];
@@ -157,17 +134,17 @@ var manager = {
             job = new Job(job_id, job_name, job_rule, job_exec, options);
             this.job_stores[job_id] = job;
             this.length++;
-            options.printLog && console.log((0, _moment2.default)().format('HH:mm:ss') + (' job [' + job.name + '(' + job.id + ')] is created.'));
+            options.printLog && console.log((0, _moment2.default)().format('HH:mm:ss') + ` job [${job.name}(${job.id})] is created.`);
         } else {
-            options.printLog && console.log((0, _moment2.default)().format('HH:mm:ss') + (' job [' + job.name + '(' + job.id + ')] is already created.'));
+            options.printLog && console.log((0, _moment2.default)().format('HH:mm:ss') + ` job [${job.name}(${job.id})] is already created.`);
         }
 
         return job;
     },
-    destroyJob: function destroyJob(job_id) {
-        var job = this.job_stores[job_id];
+    destroyJob: function (job_id) {
+        let job = this.job_stores[job_id];
         if (job) {
-            this.printLog && console.log((0, _moment2.default)().format('HH:mm:ss') + (' job [' + job.name + '(' + job.id + ')] is destroyed.'));
+            this.printLog && console.log((0, _moment2.default)().format('HH:mm:ss') + ` job [${job.name}(${job.id})] is destroyed.`);
             job.stop();
             this.job_stores[job_id] = job = null;
             this.length--;

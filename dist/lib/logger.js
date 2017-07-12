@@ -6,24 +6,28 @@ Object.defineProperty(exports, "__esModule", {
 
 var _utils = require('./utils');
 
-var logger = {
-    log: function log(logger) {
-        for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-            args[_key - 1] = arguments[_key];
+const combinedLogger = {
+    d: function (logger, ...args) {
+        let is_logger_is_log4js = logger && (0, _utils.isFunction)(logger.debug);
+        if (!(0, _utils.isProduction)()) {
+            if (!is_logger_is_log4js) {
+                args.unshift(logger);
+            }
+            console.log.apply(null, args);
         }
-
-        !(0, _utils.isProduction)() && console.log.apply(null, args);
-        logger && logger.debug.apply(logger, args);
+        is_logger_is_log4js && logger.debug.apply(logger, args);
     },
-    error: function error(logger) {
-        for (var _len2 = arguments.length, args = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
-            args[_key2 - 1] = arguments[_key2];
+    e: function (logger, ...args) {
+        let is_logger_is_log4js = logger && (0, _utils.isFunction)(logger.error);
+        if (!(0, _utils.isProduction)()) {
+            if (!is_logger_is_log4js) {
+                args.unshift(logger);
+            }
+            console.log.apply(null, args);
         }
-
-        !(0, _utils.isProduction)() && console.log.apply(null, args);
-        logger && logger.error.apply(logger, args);
+        is_logger_is_log4js && logger.error.apply(logger, args);
     }
 }; /**
     * Created by zppro on 17-7-12.
     */
-exports.default = logger;
+exports.default = combinedLogger;

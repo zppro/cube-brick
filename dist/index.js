@@ -1,8 +1,9 @@
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+  value: true
 });
+exports.logger = exports.jobManager = exports.dicBuilder = undefined;
 
 var _dictBuilder = require('./lib/dictBuilder');
 
@@ -24,12 +25,14 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+// export const dicBuilder = dicBuilder;
+// export const jobManager = jobManager;
+// export const logger = logger;
 /**
  * Created by zppro on 17-7-12.
  */
-exports.default = {
-    dicBuilder: _dictBuilder2.default,
-    jobManager: _jobManager2.default,
-    logger: _logger2.default,
-    utils: utils
-};
+
+exports.dicBuilder = _dictBuilder2.default;
+exports.jobManager = _jobManager2.default;
+exports.logger = _logger2.default;
+exports.default = utils;

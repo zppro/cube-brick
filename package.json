@@ -1,6 +1,6 @@
 {
   "name": "cube-brick",
-  "version": "0.0.8",
+  "version": "0.1.0",
   "description": "shared func/utility bricks",
   "main": "dist/index.js",
   "scripts": {
@@ -27,6 +27,7 @@
   "homepage": "https://github.com/zppro/cube-brick#readme",
   "devDependencies": {
     "babel-cli": "^6.24.1",
+    "babel-plugin-syntax-dynamic-import": "^6.18.0",
     "babel-polyfill": "^6.23.0",
     "babel-preset-env": "^1.5.2",
     "babel-register": "^6.24.1",
