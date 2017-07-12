@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _fsExtra = require('fs-extra');
 
-var _utils = require('../src/utils');
+var _utils = require('./utils');
 
 /**
  * Created by zppro on 17-6-23.

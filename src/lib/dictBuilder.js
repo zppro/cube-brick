@@ -2,7 +2,7 @@
  * Created by zppro on 17-6-23.
  */
 import { ensureFile, pathExists, readJson, writeJson } from 'fs-extra';
-import { isString, isObject, pluck, values } from '../src/utils'
+import { isString, isObject, pluck, values } from './utils'
 
 function Dict() {
     this.keys = {};

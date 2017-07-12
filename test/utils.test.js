@@ -9,7 +9,7 @@ import { expect } from 'chai';
 import { isString, isObject, isFunction, pick, pluck, values, range, rangeDateAsMonth, rangeDateAsYear, rangeDateAsDay,
     setProperty, setPropertyRecursion, setPropertyDotExpression, getPropertyCount,
     randomN, randomS, readDirectoryStructure, chunkArrayByCapacity, chunkArrayByQuantity, flatten, unflatten,
-    isPhone, isIDNo, sexFromIDNo,birthdayFromIDNo, thunk2Func, thunk2Promise, env, isProduction } from '../src/utils';
+    isPhone, isIDNo, sexFromIDNo,birthdayFromIDNo, thunk2Func, thunk2Promise, env, isProduction } from '../src/lib/utils';
 
 describe('module [utils]', () => {
 
