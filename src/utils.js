@@ -412,3 +412,12 @@ export const thunk2Promise = (fn) => {
         return thunkToPromise(thunkify(fn).apply(ctx, args));
     }
 }
+
+
+export const env = (env_str) => {
+    return process.env[env_str || 'NODE_ENV']
+}
+
+export const isProduction = () => {
+    return env() === 'production'
+}
