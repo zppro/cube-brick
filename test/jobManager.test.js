@@ -2,7 +2,7 @@
  * Created by zppro on 17-6-26.
  */
 import { expect } from 'chai';
-import jobManager from '../src/jobManager'
+import jobManager from '../src/lib/jobManager'
 import schedule from 'node-schedule';
 import moment from 'moment';
 

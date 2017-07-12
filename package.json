@@ -1,11 +1,11 @@
 {
   "name": "cube-brick",
-  "version": "0.0.6",
+  "version": "0.1.0",
   "description": "shared func/utility bricks",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
-    "test": "mocha --timeout 75000 --require babel-polyfill --compilers js:babel-register",
-    "build": "babel src -d lib"
+    "test": "cross-env NODE_ENV=test mocha --timeout 75000 --require babel-polyfill --compilers js:babel-register",
+    "build": "babel src -d dist"
   },
   "repository": {
     "type": "git",
@@ -21,13 +21,18 @@
   "bugs": {
     "url": "https://github.com/zppro/cube-brick/issues"
   },
+  "files": [
+    "dist"
+  ],
   "homepage": "https://github.com/zppro/cube-brick#readme",
   "devDependencies": {
     "babel-cli": "^6.24.1",
+    "babel-plugin-syntax-dynamic-import": "^6.18.0",
     "babel-polyfill": "^6.23.0",
     "babel-preset-env": "^1.5.2",
     "babel-register": "^6.24.1",
     "chai": "^4.0.2",
+    "cross-env": "^5.0.1",
     "mocha": "^3.4.2"
   },
   "dependencies": {

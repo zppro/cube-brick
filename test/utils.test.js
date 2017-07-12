@@ -1,24 +1,27 @@
 /**
  * Created by zppro on 17-6-22.
  */
+/**
+ * Created by zppro on 17-6-22.
+ */
 
 import { expect } from 'chai';
 import { isString, isObject, isFunction, pick, pluck, values, range, rangeDateAsMonth, rangeDateAsYear, rangeDateAsDay,
     setProperty, setPropertyRecursion, setPropertyDotExpression, getPropertyCount,
     randomN, randomS, readDirectoryStructure, chunkArrayByCapacity, chunkArrayByQuantity, flatten, unflatten,
-    isPhone, isIDNo, sexFromIDNo,birthdayFromIDNo, thunk2Func, thunk2Promise } from '../src/utils';
+    isPhone, isIDNo, sexFromIDNo,birthdayFromIDNo, thunk2Func, thunk2Promise, env, isProduction } from '../src/lib/utils';
 
 describe('module [utils]', () => {
 
     let str = 'this is a string', number = 3, arrRange, monthRange, dateRange, yearRange,
         objPick = { a: 1, b:2, c:3, d:4, e:5 }, objPickStr = JSON.stringify(objPick),
         objPluck = [{ a: 1, b:2, c:3, d:4, e:5 }, { a: 11, b:12, c:13, d:14, e:15 }], objPluckStr = JSON.stringify(objPluck),
-        func1 = function() {}, func1Str = func1.toString(), func2 = ()=> 1, func2Str = func2.toString(),
+        func1 = () => {}, func1Str = func1.toString(), func2 = ()=> 1, func2Str = func2.toString(),
         obj = {foo: 'bar' ,bas: ()=> 'aaa'}, objStr = JSON.stringify(obj),
         objRecursion = {foo: { bar: 'bas'}}, objRecursionStr = JSON.stringify(objRecursion),
         objDotExpression = {foo: { bar: { bas: 'dot'}}}, objDotExpressionStr = JSON.stringify(objDotExpression),
         objParent = {a:1}, objParentStr = JSON.stringify(objParent),objChildren,
-        arr= ['aa', 134 , function(){return 2;}], arrStr = JSON.stringify(arr), arrChunked,
+        arr= ['aa', 134 , () =>{return 2;}], arrStr = JSON.stringify(arr), arrChunked,
         objUnflatten, objUnflattenStr, objFlatten, objFlattenStr,
         thunkify_executed_value = 3, fn_to_thunk = (num1, num2, callback)=>{setTimeout(()=>{callback(null, num1 + num2)}, 1000)}, fn_to_thunk_str = fn_to_thunk.toString();
 
@@ -241,13 +244,13 @@ describe('module [utils]', () => {
     });
 
     describe(`test function <randomN>`, () => {
-        it(`The randomN(6) expect to be not equal randomN(6)`, function() {
+        it(`The randomN(6) expect to be not equal randomN(6)`, () => {
             expect(randomN(6)).to.be.not.equal(randomN(6));
         });
     });
 
     describe(`test function <randomS>`, () => {
-        it(`The randomS(12) expect to be not equal randomS(12)`, function() {
+        it(`The randomS(12) expect to be not equal randomS(12)`, () => {
             expect(randomS(6)).to.be.not.equal(randomS(6));
         });
     });
@@ -263,7 +266,7 @@ describe('module [utils]', () => {
     });
 
     describe(`test function <chunkArrayByCapacity>`, () => {
-        it(`[0,1,2,3,4,5,6,7,8,9] split arrays with each had 4 capacity at most, expect to be chunk to [0,1,2,3],  [4,5,6,7] ,  [8,9]`, function() {
+        it(`[0,1,2,3,4,5,6,7,8,9] split arrays with each had 4 capacity at most, expect to be chunk to [0,1,2,3],  [4,5,6,7] ,  [8,9]`, () => {
             arrRange = range(10);
             arrChunked = chunkArrayByCapacity(arrRange, 4);
             expect(arrChunked[0].join()).to.be.equal('0,1,2,3');
@@ -273,7 +276,7 @@ describe('module [utils]', () => {
     });
 
     describe(`test function <chunkArrayByQuantity>`, () => {
-        it(`[0,1,2,3,4,5,6,7,8,9] split to 4 arrays,  expect to be chunk to [0,1,2],  [3,4,5] ,  [6,7,8] ,[9]`, function() {
+        it(`[0,1,2,3,4,5,6,7,8,9] split to 4 arrays,  expect to be chunk to [0,1,2],  [3,4,5] ,  [6,7,8] ,[9]`, () => {
             arrRange = range(10);
             arrChunked = chunkArrayByQuantity(arrRange, 4);
             expect(arrChunked[0].join()).to.be.equal('0,1,2');
@@ -281,7 +284,7 @@ describe('module [utils]', () => {
             expect(arrChunked[2].join()).to.be.equal('6,7,8');
             expect(arrChunked[3].join()).to.be.equal('9');
         });
-        it(`[0,1,2,3,4,5,6,7,8,9] split to 3 arrays, expect to be chunk to [0,1,2,3],  [4,5,6,7] ,  [8,9]`, function() {
+        it(`[0,1,2,3,4,5,6,7,8,9] split to 3 arrays, expect to be chunk to [0,1,2,3],  [4,5,6,7] ,  [8,9]`, () => {
             arrRange = range(10);
             arrChunked = chunkArrayByQuantity(arrRange, 3);
             expect(arrChunked[0].join()).to.be.equal('0,1,2,3');
@@ -319,25 +322,25 @@ describe('module [utils]', () => {
     });
 
     describe(`test function <isPhone>`, () => {
-        it(`The isPhone('13958009802') should be ok`, function() {
+        it(`The isPhone('13958009802') should be ok`, () => {
             expect(isPhone('13958009802')).to.be.ok;
         });
     });
 
     describe(`test function <isIDNo>`, () => {
-        it(`The isIDNo('330104191612181028') should be ok`, function() {
+        it(`The isIDNo('330104191612181028') should be ok`, () => {
             expect(isIDNo('330104191612181028')).to.be.ok;
         });
     });
 
     describe(`test function <sexFromIDNo>`, () => {
-        it(`The sexFromIDNo('330104191612181028') should be 'F' `, function() {
+        it(`The sexFromIDNo('330104191612181028') should be 'F' `, () => {
             expect(sexFromIDNo('330104191612181028')).to.be.equal('F');
         });
     });
 
     describe(`test function <birthdayFromIDNo>`, () => {
-        it(`The birthdayFromIDNo('330104191612181028') should be '1916-12-18' `, function() {
+        it(`The birthdayFromIDNo('330104191612181028') should be '1916-12-18' `, () => {
             expect(birthdayFromIDNo('330104191612181028')).to.be.equal('1916-12-18');
         });
     });
@@ -358,6 +361,18 @@ describe('module [utils]', () => {
                     expect(newValue).to.be.equal(thunkify_executed_value);
                     done();
                 }).catch((err)=>{console.log(err);});
+        });
+    });
+
+    describe(`test function <env>`, () => {
+        it(`The env() should be 'test' `, () => {
+            expect(env()).to.be.equal('test');
+        });
+    });
+
+    describe(`test function <isProduction>`, () => {
+        it(`The isProduction() should be false `, () => {
+            expect(isProduction()).to.be.not.ok;
         });
     });
 });
