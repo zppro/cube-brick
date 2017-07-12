@@ -6,6 +6,8 @@ import klaw from 'klaw';
 import path from 'path';
 import through2 from 'through2';
 import moment from 'moment';
+import thunkify from 'thunkify';
+import thunkToPromise from 'thunk-to-promise';
 
 export const isString = (o) => {
     return Object.prototype.toString.call(o) == '[object String]';
@@ -402,3 +404,11 @@ export const birthdayFromIDNo = (idNo) => {
     return '';
 }
 
+export const thunk2Func = thunkify;
+
+export const thunk2Promise = (fn) => {
+    let ctx = this;
+    return (...args) => {
+        return thunkToPromise(thunkify(fn).apply(ctx, args));
+    }
+}
