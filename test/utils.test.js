@@ -6,7 +6,7 @@ import { expect } from 'chai';
 import { isString, isObject, isFunction, pick, pluck, values, range, rangeDateAsMonth, rangeDateAsYear, rangeDateAsDay,
     setProperty, setPropertyRecursion, setPropertyDotExpression, getPropertyCount,
     randomN, randomS, readDirectoryStructure, chunkArrayByCapacity, chunkArrayByQuantity, flatten, unflatten,
-    isPhone, isIDNo, sexFromIDNo,birthdayFromIDNo } from '../src/utils';
+    isPhone, isIDNo, sexFromIDNo,birthdayFromIDNo, thunk2Func, thunk2Promise } from '../src/utils';
 
 describe('module [utils]', () => {
 
@@ -19,7 +19,8 @@ describe('module [utils]', () => {
         objDotExpression = {foo: { bar: { bas: 'dot'}}}, objDotExpressionStr = JSON.stringify(objDotExpression),
         objParent = {a:1}, objParentStr = JSON.stringify(objParent),objChildren,
         arr= ['aa', 134 , function(){return 2;}], arrStr = JSON.stringify(arr), arrChunked,
-        objUnflatten, objUnflattenStr, objFlatten, objFlattenStr;
+        objUnflatten, objUnflattenStr, objFlatten, objFlattenStr,
+        thunkify_executed_value = 3, fn_to_thunk = (num1, num2, callback)=>{setTimeout(()=>{callback(null, num1 + num2)}, 1000)}, fn_to_thunk_str = fn_to_thunk.toString();
 
     describe(`test function <isString>`, () => {
 
@@ -340,5 +341,23 @@ describe('module [utils]', () => {
             expect(birthdayFromIDNo('330104191612181028')).to.be.equal('1916-12-18');
         });
     });
-    
+
+    describe(`test function <thunk2Func>`, () => {
+        it(`After thunk2Func(${fn_to_thunk_str})(1, 2) executed, thunkify_executed_value should be equal thunkify_executed_value`, function(done) {
+            thunk2Func(fn_to_thunk)(1, 2)((err, newValue)=>{
+                expect(newValue).to.be.equal(thunkify_executed_value);
+                done();
+            });
+        });
+    });
+
+    describe(`test function <thunk2Promise>`, () => {
+        it(`After thunk2Promise(${fn_to_thunk_str})(1, 2) executed, thunkify_executed_value should be equal thunkify_executed_value`, function(done) {
+            thunk2Promise(fn_to_thunk)(1, 2)
+                .then(function (newValue) {
+                    expect(newValue).to.be.equal(thunkify_executed_value);
+                    done();
+                }).catch((err)=>{console.log(err);});
+        });
+    });
 });
