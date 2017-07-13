@@ -3,7 +3,7 @@
  */
 import { expect } from 'chai';
 import { join } from 'path'
-import dictBuilder from '../src/lib/dictBuilder'
+import dictBuilder from '../src/lib/dict-builder'
 
 describe('module [dictBuilder]', () => {
     let d1 = dictBuilder(), slot1='slot1', slot2='slot2', slot3='slot3',

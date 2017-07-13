@@ -5,11 +5,11 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.logger = exports.jobManager = exports.dicBuilder = undefined;
 
-var _dictBuilder = require('./lib/dictBuilder');
+var _dictBuilder = require('./lib/dict-builder');
 
 var _dictBuilder2 = _interopRequireDefault(_dictBuilder);
 
-var _jobManager = require('./lib/jobManager');
+var _jobManager = require('./lib/job-manager');
 
 var _jobManager2 = _interopRequireDefault(_jobManager);
 

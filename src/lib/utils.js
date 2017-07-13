@@ -190,21 +190,31 @@ export const readDirectoryStructure = (dir, options) => {
         next()
     });
 
+    if(options.format === 'tree') {
+        return _transformTree(dir, filter);
+    } else if (options.format === 'array') {
+        return _transformArray(dir, filter);
+    } else {
+        return _transformObject(dir, filter);
+    }
+
     return options.format === 'tree' ? _transformTree(dir, filter) : _transformObject(dir, filter);
 };
 
 const _transformTree = (dir, filter) => {
     let promise  = _transformObject(dir,filter).then(function(ret){
-        let fileKeys = ['name', 'relative_name', 'path', 'relative_path'];
-        let treeNodes = [], dirNode, children;
+        let treeNodes = [], value, dirNode, children;
         for(let key of Object.keys(ret)) {
-            if (!fileKeys.includes(key) && isObject(ret[key])) {
-                dirNode = {_id: ret[key].relative_path || key, name: key};
-                children = _parseChildren(ret[key], fileKeys);
+            value = ret[key];
+            if (value.tag === 'dir') {
+                dirNode = {_id: value.relative_path || key, name: key};
+                children = _parseTreeNode(value);
                 if (children && children.length > 0) {
                     dirNode.children = children;
                 }
                 treeNodes.push(dirNode)
+            } else if (value.tag === 'file') {
+                treeNodes.push({_id: value.relative_path || key, ...value})
             }
         }
         return treeNodes;
@@ -212,12 +222,13 @@ const _transformTree = (dir, filter) => {
     return promise;
 };
 
-const _parseChildren = (obj, fileKeys) => {
-    let treeNodes = [], dirNode, children;
+const _parseTreeNode = (obj) => {
+    let treeNodes = [], value, dirNode, children;
     for(let key of Object.keys(obj)) {
-        if (!fileKeys.includes(fileKeys, key) && isObject(obj[key])) {
-            dirNode = {_id: obj[key].relative_path || key, name: key};
-            children = _parseChildren(obj[key], fileKeys);
+        value = obj[key];
+        if (value.tag === 'dir') {
+            dirNode = {_id: value.relative_path || key, name: key};
+            children = _parseTreeNode(value);
             if (children && children.length > 0) {
                 dirNode.children = children;
             }
@@ -227,15 +238,48 @@ const _parseChildren = (obj, fileKeys) => {
     return treeNodes;
 };
 
+const _transformArray = (dir, filter) => {
+    let promise  = _transformObject(dir, filter).then(function(ret){
+        let arr = [], value;
+        for(let key of Object.keys(ret)) {
+            value = ret[key];
+            // console.log('value:', value.tag, key, value);
+            if (value.tag === 'dir') {
+                arr.push(..._parseArrayMember(value));
+            } else if (value.tag === 'file') {
+                arr.push(value);
+            }
+        }
+        return arr;
+    });
+    return promise;
+};
+
+const _parseArrayMember = (obj) => {
+    let arr = [], value;
+    for(let key of Object.keys(obj)) {
+        value = obj[key];
+        if (value.tag === 'dir') {
+            arr.push(..._parseArrayMember(value));
+        } else if (value.tag === 'file') {
+            // console.log('in:', value);
+            arr.push(value);
+        }
+    }
+    return arr;
+};
+
 const _transformObject = (dir, filter) => {
+    let root_base_name = path.basename(dir);
     let promise = new Promise(resolve=> {
             let ret = {};
             klaw(dir)
                 .pipe(filter)
                 .on('data', function (item) {
                     let baseName = path.basename(item.path);
+
                     if (item.stats.isDirectory()) {
-                        ret[baseName] = {};
+                        ret[baseName] = {tag: 'dir'};
                     }
                     else {
                         let relativeDirs = item.path.replace(dir + '/', '').split('/');
@@ -243,7 +287,7 @@ const _transformObject = (dir, filter) => {
                         let dirLength = relativeDirs.length;
                         let parent = ret;
                         for (let i = 0; i < dirLength; i++) {
-                            parent[relativeDirs[i]] = parent[relativeDirs[i]] || {};
+                            parent[relativeDirs[i]] = parent[relativeDirs[i]] || {tag: 'dir'};
                             parent = parent[relativeDirs[i]];
                         }
                         let extName = path.extname(item.path);
@@ -254,7 +298,9 @@ const _transformObject = (dir, filter) => {
                             name: key,
                             relative_name: relativeDirs.join('_') + '_' + noExtBaseName,
                             path: item.path,
-                            relative_path: relativeDirs.join('/') + '/' + baseName
+                            relative_path: path.join(root_base_name, relativeDirs.join('/') , baseName),
+                            relative_path2: relativeDirs.length > 0 ? relativeDirs.join('/') + '/' + baseName : baseName,
+                            tag: 'file'
                         };
                     }
                 })

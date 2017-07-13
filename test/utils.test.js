@@ -257,8 +257,9 @@ describe('module [utils]', () => {
 
     describe(`test function <readDirectoryStructure>`, () => {
         it("readDirectoryStructure to.be.not.empty", function(done) {
-            readDirectoryStructure(__dirname + '/../', { exts: ['.js', '.json'], excludeDirs: ['node_modules', '.git']})
+            readDirectoryStructure(__dirname + '/../', { format: 'tree', exts: ['.js', '.json'], excludeDirs: ['node_modules', '.git']})
             .then(function(ret) {
+                console.log(ret);
                 expect(ret).to.be.not.empty;
                 done();
             });
