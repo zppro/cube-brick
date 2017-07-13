@@ -9,15 +9,15 @@ import moment from 'moment';
 import thunkify from 'thunkify';
 import thunkToPromise from 'thunk-to-promise';
 
-export const isString = (o) => {
+export const isString = o => {
     return Object.prototype.toString.call(o) == '[object String]';
 };
 
-export const isObject = (o) => {
+export const isObject = o => {
     return o === Object(o);
 };
 
-export const isFunction = (o) => {
+export const isFunction = o => {
     let getType = {};
     return o && getType.toString.call(o) === '[object Function]';
 };
@@ -42,7 +42,7 @@ export const pluck = (arr, key) => {
     return arr.map(o => o[key])
 };
 
-export const values = (o) => {
+export const values = o => {
     return Object.keys(o).map(k => o[k]);
 };
 
@@ -138,7 +138,7 @@ export const setPropertyDotExpression = (o,k,v) => {
     }
 };
 
-export const getPropertyCount = (o) => {
+export const getPropertyCount = o => {
     let count = 0;
     for (let k of Object.keys(o)) {
         count++;
@@ -147,11 +147,11 @@ export const getPropertyCount = (o) => {
 }
 
 
-export const randomN = (len) => {
+export const randomN = len => {
     return Math.random().toString().substr(2,len);
 };
 
-export const randomS = (len) => {
+export const randomS = len => {
     return process.binding('crypto').randomBytes(len).toString('hex').substr(0, len);
 };
 
@@ -314,13 +314,13 @@ const recurse = (result, cur, prop) => {
     }
 };
 
-export const flatten = (data) => {
+export const flatten = data => {
     let result = {};
     recurse(result, data, "");
     return result;
 };
 
-export const unflatten = (o) => {
+export const unflatten = o => {
     if (!isObject(o) || Array.isArray(o))
         return o;
     let regex = /\.?([^.\[\]]+)|\[(\d+)\]/g,
@@ -340,7 +340,7 @@ export const unflatten = (o) => {
 
 export const isPhone = aPhone => RegExp(/^(0|86|17951)?(13[0-9]|15[012356789]|18[0-9]|14[57]|177)[0-9]{8}$/).test(aPhone);
 
-export const isIDNo = (code) => {
+export const isIDNo = code => {
     let city= {11:"北京",12:"天津",13:"河北",14:"山西",15:"内蒙古",21:"辽宁",22:"吉林",23:"黑龙江 ",31:"上海",32:"江苏",33:"浙江",34:"安徽",35:"福建",36:"江西",37:"山东",41:"河南",42:"湖北 ",43:"湖南",44:"广东",45:"广西",46:"海南",50:"重庆",51:"四川",52:"贵州",53:"云南",54:"西藏 ",61:"陕西",62:"甘肃",63:"青海",64:"宁夏",65:"新疆",71:"台湾",81:"香港",82:"澳门",91:"国外 "},
     tip = '', pass= true;
 
@@ -382,7 +382,7 @@ export const isIDNo = (code) => {
     return pass;
 }
 
-export const sexFromIDNo = (idNo) => {
+export const sexFromIDNo = idNo => {
     if (isIDNo(idNo)) {
         if(idNo.length == 18) {
             return idNo.charAt(16) % 2 ? 'M' : 'F'
@@ -393,7 +393,7 @@ export const sexFromIDNo = (idNo) => {
     return 'N';
 }
 
-export const birthdayFromIDNo = (idNo) => {
+export const birthdayFromIDNo = idNo => {
     if (isIDNo(idNo)) {
         if(idNo.length == 18) {
             return idNo.substr(6, 4) + '-' + idNo.substr(10, 2) + '-' + idNo.substr(12, 2);
@@ -406,7 +406,7 @@ export const birthdayFromIDNo = (idNo) => {
 
 export const thunk2Func = thunkify;
 
-export const thunk2Promise = (fn) => {
+export const thunk2Promise = fn => {
     let ctx = this;
     return (...args) => {
         return thunkToPromise(thunkify(fn).apply(ctx, args));
@@ -414,7 +414,7 @@ export const thunk2Promise = (fn) => {
 }
 
 
-export const env = (env_str) => {
+export const env = env_str => {
     return process.env[env_str || 'NODE_ENV']
 }
 
