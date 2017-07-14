@@ -5,6 +5,10 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.isProduction = exports.env = exports.thunk2Promise = exports.thunk2Func = exports.birthdayFromIDNo = exports.sexFromIDNo = exports.isIDNo = exports.isPhone = exports.unflatten = exports.flatten = exports.chunkArrayByQuantity = exports.chunkArrayByCapacity = exports.readDirectoryStructure = exports.randomS = exports.randomN = exports.getPropertyCount = exports.setPropertyDotExpression = exports.setPropertyRecursion = exports.setProperty = exports.rangeDateAsDay = exports.rangeDateAsYear = exports.rangeDateAsMonth = exports.range = exports.values = exports.pluck = exports.pick = exports.isFunction = exports.isObject = exports.isString = undefined;
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; /**
+                                                                                                                                                                                                                                                                   * Created by zppro on 17-6-22.
+                                                                                                                                                                                                                                                                   */
+
 var _klaw = require('klaw');
 
 var _klaw2 = _interopRequireDefault(_klaw);
@@ -30,10 +34,6 @@ var _thunkToPromise = require('thunk-to-promise');
 var _thunkToPromise2 = _interopRequireDefault(_thunkToPromise);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
- * Created by zppro on 17-6-22.
- */
 
 const isString = exports.isString = o => {
     return Object.prototype.toString.call(o) == '[object String]';
@@ -217,23 +217,34 @@ const readDirectoryStructure = exports.readDirectoryStructure = (dir, options) =
         next();
     });
 
+    if (options.format === 'tree') {
+        return _transformTree(dir, filter);
+    } else if (options.format === 'array') {
+        return _transformArray(dir, filter);
+    } else {
+        return _transformObject(dir, filter);
+    }
+
     return options.format === 'tree' ? _transformTree(dir, filter) : _transformObject(dir, filter);
 };
 
 const _transformTree = (dir, filter) => {
     let promise = _transformObject(dir, filter).then(function (ret) {
-        let fileKeys = ['name', 'relative_name', 'path', 'relative_path'];
         let treeNodes = [],
+            value,
             dirNode,
             children;
         for (let key of Object.keys(ret)) {
-            if (!fileKeys.includes(key) && isObject(ret[key])) {
-                dirNode = { _id: ret[key].relative_path || key, name: key };
-                children = _parseChildren(ret[key], fileKeys);
+            value = ret[key];
+            if (value.tag === 'dir') {
+                dirNode = { _id: value.relative_path || key, name: key };
+                children = _parseTreeNode(value);
                 if (children && children.length > 0) {
                     dirNode.children = children;
                 }
                 treeNodes.push(dirNode);
+            } else if (value.tag === 'file') {
+                treeNodes.push(_extends({ _id: value.relative_path || key }, value));
             }
         }
         return treeNodes;
@@ -241,14 +252,16 @@ const _transformTree = (dir, filter) => {
     return promise;
 };
 
-const _parseChildren = (obj, fileKeys) => {
+const _parseTreeNode = obj => {
     let treeNodes = [],
+        value,
         dirNode,
         children;
     for (let key of Object.keys(obj)) {
-        if (!fileKeys.includes(fileKeys, key) && isObject(obj[key])) {
-            dirNode = { _id: obj[key].relative_path || key, name: key };
-            children = _parseChildren(obj[key], fileKeys);
+        value = obj[key];
+        if (value.tag === 'dir') {
+            dirNode = { _id: value.relative_path || key, name: key };
+            children = _parseTreeNode(value);
             if (children && children.length > 0) {
                 dirNode.children = children;
             }
@@ -258,20 +271,55 @@ const _parseChildren = (obj, fileKeys) => {
     return treeNodes;
 };
 
+const _transformArray = (dir, filter) => {
+    let promise = _transformObject(dir, filter).then(function (ret) {
+        let arr = [],
+            value;
+        for (let key of Object.keys(ret)) {
+            value = ret[key];
+            // console.log('value:', value.tag, key, value);
+            if (value.tag === 'dir') {
+                arr.push(..._parseArrayMember(value));
+            } else if (value.tag === 'file') {
+                arr.push(value);
+            }
+        }
+        return arr;
+    });
+    return promise;
+};
+
+const _parseArrayMember = obj => {
+    let arr = [],
+        value;
+    for (let key of Object.keys(obj)) {
+        value = obj[key];
+        if (value.tag === 'dir') {
+            arr.push(..._parseArrayMember(value));
+        } else if (value.tag === 'file') {
+            // console.log('in:', value);
+            arr.push(value);
+        }
+    }
+    return arr;
+};
+
 const _transformObject = (dir, filter) => {
+    let root_base_name = _path2.default.basename(dir);
     let promise = new Promise(resolve => {
         let ret = {};
         (0, _klaw2.default)(dir).pipe(filter).on('data', function (item) {
             let baseName = _path2.default.basename(item.path);
+
             if (item.stats.isDirectory()) {
-                ret[baseName] = {};
+                ret[baseName] = { tag: 'dir' };
             } else {
                 let relativeDirs = item.path.replace(dir + '/', '').split('/');
                 relativeDirs.splice(relativeDirs.length - 1, 1);
                 let dirLength = relativeDirs.length;
                 let parent = ret;
                 for (let i = 0; i < dirLength; i++) {
-                    parent[relativeDirs[i]] = parent[relativeDirs[i]] || {};
+                    parent[relativeDirs[i]] = parent[relativeDirs[i]] || { tag: 'dir' };
                     parent = parent[relativeDirs[i]];
                 }
                 let extName = _path2.default.extname(item.path);
@@ -282,7 +330,9 @@ const _transformObject = (dir, filter) => {
                     name: key,
                     relative_name: relativeDirs.join('_') + '_' + noExtBaseName,
                     path: item.path,
-                    relative_path: relativeDirs.join('/') + '/' + baseName
+                    relative_path: _path2.default.join(root_base_name, relativeDirs.join('/'), baseName),
+                    relative_path2: relativeDirs.length > 0 ? relativeDirs.join('/') + '/' + baseName : baseName,
+                    tag: 'file'
                 };
             }
         }).on('end', function () {

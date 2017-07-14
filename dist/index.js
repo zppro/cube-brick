@@ -3,19 +3,27 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.logger = exports.jobManager = exports.dicBuilder = undefined;
+exports.responser = exports.mongoManager = exports.mongoFactory = exports.logger = exports.jobManager = exports.dicBuilder = undefined;
 
-var _dictBuilder = require('./lib/dictBuilder');
+var _dictBuilder = require('./lib/dict-builder');
 
 var _dictBuilder2 = _interopRequireDefault(_dictBuilder);
 
-var _jobManager = require('./lib/jobManager');
+var _jobManager = require('./lib/job-manager');
 
 var _jobManager2 = _interopRequireDefault(_jobManager);
 
 var _logger = require('./lib/logger');
 
 var _logger2 = _interopRequireDefault(_logger);
+
+var _mongoFactory = require('./lib/mongo-factory');
+
+var _mongoFactory2 = _interopRequireDefault(_mongoFactory);
+
+var _responser = require('./lib/responser');
+
+var _responser2 = _interopRequireDefault(_responser);
 
 var _utils = require('./lib/utils');
 
@@ -35,4 +43,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 exports.dicBuilder = _dictBuilder2.default;
 exports.jobManager = _jobManager2.default;
 exports.logger = _logger2.default;
+exports.mongoFactory = _mongoFactory2.default;
+exports.mongoManager = _mongoFactory.DBManager;
+exports.responser = _responser2.default;
 exports.default = utils;

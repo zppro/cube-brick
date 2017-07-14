@@ -2,11 +2,11 @@
  * Created by zppro on 17-6-26.
  */
 import { expect } from 'chai';
-import jobManager from '../src/lib/jobManager'
+import jobManager from '../src/lib/job-manager'
 import schedule from 'node-schedule';
 import moment from 'moment';
 
-describe('module [jobManager]', () => {
+describe('module [job-manager]', () => {
 
     let job1, job_id_1 = 'job_per_miniute', job_name_1 = '每分钟执行一次的任务', job_rule_1 = '*/1 * * * *', beginTime, endTime,
         currentJob;
