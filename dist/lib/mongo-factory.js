@@ -180,7 +180,8 @@ const DBManager = exports.DBManager = {
         for (let schemaFile of schemaFiles) {
             let importPath = _path2.default.join(dir, schemaFile.relative_path2);
             await Promise.resolve().then(() => require(`${importPath}`)).then(schema => {
-                DBManager.models[schemaFile.relative_name] = db.createModel(schemaFile.relative_name, schema, schemaFile.relative_name);
+                db.createModel(schemaFile.relative_name, schema, schemaFile.relative_name);
+                // DBManager.models[schemaFile.relative_name] = db.createModel(schemaFile.relative_name, schema, schemaFile.relative_name);
             });
         }
     }
