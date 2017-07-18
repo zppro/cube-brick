@@ -169,7 +169,7 @@ export const DBManager = {
         for(let schemaFile of schemaFiles) {
             let importPath = path.join(dir, schemaFile.relative_path2);
             await import(importPath).then(schema => {
-                db.createModel(schemaFile.relative_name, schema, schemaFile.relative_name);
+                db.createModel(schemaFile.relative_name, schema.default || schema, schemaFile.relative_name);
                 // DBManager.models[schemaFile.relative_name] = db.createModel(schemaFile.relative_name, schema, schemaFile.relative_name);
             });
         }
