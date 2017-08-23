@@ -336,7 +336,7 @@ const _transformObject = (dir, filter) => {
 
         parent[key] = {
           name: key,
-          relative_name: relativeDirs.join('_') + '_' + noExtBaseName,
+          relative_name: relativeDirs.length > 0 ? relativeDirs.join('_') + '_' + noExtBaseName : noExtBaseName,
           path: item.path,
           relative_path: _path2.default.join(root_base_name, relativeDirs.join('/'), baseName),
           relative_path2: relativeDirs.length > 0 ? relativeDirs.join('/') + '/' + baseName : baseName,
