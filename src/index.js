@@ -8,11 +8,12 @@ import logger from './lib/logger';
 import mongoFactory, { DBManager as mongoManager } from './lib/mongo-factory';
 import responser from './lib/responser';
 import * as utils from './lib/utils';
+import * as h from './lib/h';
 
 // export const dicBuilder = dicBuilder;
 // export const jobManager = jobManager;
 // export const logger = logger;
-export {koaCORS, dicBuilder, jobManager, logger, mongoFactory, mongoManager, responser};
+export {koaCORS, dicBuilder, jobManager, logger, mongoFactory, mongoManager, responser, h};
 export default utils;
 
 

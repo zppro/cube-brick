@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.responser = exports.mongoManager = exports.mongoFactory = exports.logger = exports.jobManager = exports.dicBuilder = exports.koaCORS = undefined;
+exports.h = exports.responser = exports.mongoManager = exports.mongoFactory = exports.logger = exports.jobManager = exports.dicBuilder = exports.koaCORS = undefined;
 
 var _CORS = require('./lib/koa-middlewares/CORS');
 
@@ -33,6 +33,10 @@ var _utils = require('./lib/utils');
 
 var utils = _interopRequireWildcard(_utils);
 
+var _h = require('./lib/h');
+
+var h = _interopRequireWildcard(_h);
+
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -40,14 +44,15 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 // export const dicBuilder = dicBuilder;
 // export const jobManager = jobManager;
 // export const logger = logger;
+/**
+ * Created by zppro on 17-7-12.
+ */
 exports.koaCORS = _CORS2.default;
 exports.dicBuilder = _dictBuilder2.default;
 exports.jobManager = _jobManager2.default;
 exports.logger = _logger2.default;
 exports.mongoFactory = _mongoFactory2.default;
 exports.mongoManager = _mongoFactory.DBManager;
-exports.responser = _responser2.default; /**
-                                          * Created by zppro on 17-7-12.
-                                          */
-
+exports.responser = _responser2.default;
+exports.h = h;
 exports.default = utils;
