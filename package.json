@@ -1,11 +1,12 @@
 {
   "name": "cube-brick",
-  "version": "0.1.29",
+  "version": "0.1.32",
   "description": "shared func/utility bricks",
   "main": "dist/index.js",
   "scripts": {
     "test": "cross-env NODE_ENV=test mocha --timeout 75000 --require babel-polyfill --compilers js:babel-register",
-    "build": "babel src -d dist"
+    "build": "babel src -d dist",
+    "prepublish": "npm run build"
   },
   "repository": {
     "type": "git",
