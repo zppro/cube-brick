@@ -9,7 +9,7 @@ import { expect } from 'chai';
 import { isString, isObject, isFunction, pick, omit, pluck, values, range, rangeDateAsMonth, rangeDateAsYear, rangeDateAsDay,
     setProperty, setPropertyRecursion, setPropertyDotExpression, getPropertyCount,
     randomN, randomS, readDirectoryStructure, chunkArrayByCapacity, chunkArrayByQuantity, flatten, unflatten,
-    isPhone, isIDNo, sexFromIDNo,birthdayFromIDNo, thunk2Func, thunk2Promise, env, isProduction } from '../src/lib/utils';
+    isPhone, isIDNo, sexFromIDNo,birthdayFromIDNo, thunk2Func, thunk2Promise, env, isProduction, createReadStream } from '../src/lib/utils';
 
 describe('module [utils]', () => {
 
@@ -407,6 +407,18 @@ describe('module [utils]', () => {
   describe(`test function <isProduction>`, () => {
     it(`The isProduction() should be false `, () => {
       expect(isProduction()).to.be.not.ok;
+    });
+  });
+
+  describe(`test function <createReadStream>`, () => {
+    it(`The createReadStream(new Buffer([97, 98, 99])) make buffer to stream should be 'abc' `, () => {
+      let buffered = createReadStream(new Buffer([97, 98, 99])).read(3).toString();
+      expect(buffered).to.be.equal('abc');
+    });
+    it(`The createReadStream({ a: 1, b: 2 }) make string to stream should be 'abc' `, () => {
+      let buffered = createReadStream({ a: 1, b: 2 }).read();
+      expect(buffered.a).to.be.equal(1);
+      expect(buffered.b).to.be.equal(2);
     });
   });
 });

@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.isProduction = exports.env = exports.thunk2Promise = exports.thunk2Func = exports.birthdayFromIDNo = exports.sexFromIDNo = exports.isIDNo = exports.isPhone = exports.unflatten = exports.flatten = exports.chunkArrayByQuantity = exports.chunkArrayByCapacity = exports.readDirectoryStructure = exports.randomS = exports.randomN = exports.getPropertyCount = exports.setPropertyDotExpression = exports.setPropertyRecursion = exports.setProperty = exports.rangeDateAsDay = exports.rangeDateAsYear = exports.rangeDateAsMonth = exports.range = exports.values = exports.pluck = exports.omit = exports.pick = exports.isFunction = exports.isObject = exports.isString = undefined;
+exports.createReadStream = exports.isProduction = exports.env = exports.execFileP = exports.execP = exports.thunk2Promise = exports.thunk2Func = exports.birthdayFromIDNo = exports.sexFromIDNo = exports.isIDNo = exports.isPhone = exports.unflatten = exports.flatten = exports.chunkArrayByQuantity = exports.chunkArrayByCapacity = exports.readDirectoryStructure = exports.randomS = exports.randomN = exports.getPropertyCount = exports.setPropertyDotExpression = exports.setPropertyRecursion = exports.setProperty = exports.rangeDateAsDay = exports.rangeDateAsYear = exports.rangeDateAsMonth = exports.range = exports.values = exports.pluck = exports.omit = exports.pick = exports.isFunction = exports.isObject = exports.isString = undefined;
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; /**
                                                                                                                                                                                                                                                                    * Created by zppro on 17-6-22.
@@ -32,6 +32,18 @@ var _thunkify2 = _interopRequireDefault(_thunkify);
 var _thunkToPromise = require('thunk-to-promise');
 
 var _thunkToPromise2 = _interopRequireDefault(_thunkToPromise);
+
+var _child_process = require('child_process');
+
+var _child_process2 = _interopRequireDefault(_child_process);
+
+var _util = require('util');
+
+var _util2 = _interopRequireDefault(_util);
+
+var _stream = require('stream');
+
+var _stream2 = _interopRequireDefault(_stream);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -533,10 +545,37 @@ const thunk2Promise = exports.thunk2Promise = fn => {
   };
 };
 
+const execP = exports.execP = _util2.default.promisify(_child_process2.default.exec);
+const execFileP = exports.execFileP = _util2.default.promisify(_child_process2.default.execFile);
+
 const env = exports.env = env_str => {
   return process.env[env_str || 'NODE_ENV'];
 };
 
 const isProduction = exports.isProduction = () => {
   return env() === 'production';
+};
+
+const MultiStream = function (object, options) {
+  if (object instanceof Buffer || typeof object === 'string') {
+    options = options || {};
+    _stream2.default.Readable.call(this, {
+      highWaterMark: options.highWaterMark,
+      encoding: options.encoding
+    });
+  } else {
+    _stream2.default.Readable.call(this, { objectMode: true });
+  }
+  this._object = object;
+};
+
+_util2.default.inherits(MultiStream, _stream2.default.Readable);
+
+MultiStream.prototype._read = function () {
+  this.push(this._object);
+  this._object = null;
+};
+
+const createReadStream = exports.createReadStream = function (object, options) {
+  return new MultiStream(object, options);
 };

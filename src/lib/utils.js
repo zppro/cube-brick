@@ -8,6 +8,9 @@ import through2 from 'through2';
 import moment from 'moment';
 import thunkify from 'thunkify';
 import thunkToPromise from 'thunk-to-promise';
+import child_process from 'child_process';
+import util from 'util';
+import stream from 'stream';
 
 export const isString = o => {
   return Object.prototype.toString.call(o) == '[object String]';
@@ -506,6 +509,8 @@ export const thunk2Promise = fn => {
   }
 }
 
+export const execP = util.promisify(child_process.exec);
+export const execFileP = util.promisify(child_process.execFile);
 
 export const env = env_str => {
   return process.env[env_str || 'NODE_ENV']
@@ -514,3 +519,27 @@ export const env = env_str => {
 export const isProduction = () => {
   return env() === 'production'
 }
+
+const MultiStream = function (object, options) {
+  if (object instanceof Buffer || typeof object === 'string') {
+    options = options || {};
+    stream.Readable.call(this, {
+      highWaterMark: options.highWaterMark,
+      encoding: options.encoding
+    });
+  } else {
+    stream.Readable.call(this, { objectMode: true });
+  }
+  this._object = object;
+};
+
+util.inherits(MultiStream, stream.Readable);
+
+MultiStream.prototype._read = function () {
+  this.push(this._object);
+  this._object = null;
+};
+
+export const createReadStream = function (object, options) {
+  return new MultiStream (object, options);
+};
