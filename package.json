@@ -1,6 +1,6 @@
 {
   "name": "cube-brick",
-  "version": "0.1.32",
+  "version": "0.1.34",
   "description": "shared func/utility bricks",
   "main": "dist/index.js",
   "scripts": {
